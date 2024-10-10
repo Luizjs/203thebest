@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido de Blusas - Interclasse</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Pedido de Blusas - Interclasse</h1>
+        
+        <!-- Caixa de notificação -->
+        <div id="notification" class="notification"></div>
+        
+        <!-- Formulário de pedido -->
+        <form id="shirtForm">
+            <label for="name">Nome:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="number">Número da camisa:</label>
+            <input type="number" id="number" name="number" min="0" max="99" required>
+
+            <label for="size">Tamanho da blusa:</label>
+            <select id="size" name="size" required>
+                <option value="P">P</option>
+                <option value="M">M</option>
+                <option value="G">G</option>
+                <option value="GG">GG</option>
+                <option value="XG">XG</option>
+                <option value="3G">3G</option>
+                <option value="4G">4G</option>
+            </select>
+
+            <label for="type">Tipo de camisa:</label>
+            <select id="type" name="type" required>
+                <option value="Normal">Normal</option>
+                <option value="Babylook">Babylook</option>
+            </select>
+
+            <label for="payment">Forma de pagamento:</label>
+            <select id="payment" name="payment" required>
+                <option value="Pix">Pix</option>
+                <option value="Dinheiro">Dinheiro</option>
+            </select>
+
+            <!-- Barra de progresso -->
+            <div id="progressContainer" class="progress-container" style="display: none;">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+
+            <button type="submit">Enviar Pedido</button>
+        </form>
+
+        <!-- Imagem que será trocada de acordo com a escolha do tipo de camisa -->
+        <div class="shirt-image">
+            <img id="shirtImage" src="normal_tamanhos.jpg" alt="Imagem Normal">
+        </div>
+    </div>
+
+    <script src="/script.js"></script>
+</body>
+</html>

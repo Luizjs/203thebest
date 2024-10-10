@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração - Pedidos</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Administração - Pedidos</h1>
+        <form id="adminLogin">
+            <label for="username">Usuário:</label>
+            <input type="text" id="username" required>
+
+            <label for="password">Senha:</label>
+            <input type="password" id="password" required>
+
+            <button type="submit">Entrar</button>
+        </form>
+
+        <div id="orders" style="display:none;">
+            <h2>Lista de Pedidos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Opções</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <!-- Botão para copiar todos os pedidos -->
+            <button id="copyOrders" style="margin-top: 20px;">Copiar Todos os Pedidos</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('adminLogin').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('adminLogin').style.display = 'none';
+                    document.getElementById('orders').style.display = 'block';
+                    fetchOrders();
+                } else {
+                    alert('Usuário ou senha incorretos');
+                }
+            });
+        });
+
+        function fetchOrders() {
+            fetch('/api/admin/orders')
+                .then(response => response.json())
+                .then(orders => {
+                    const tbody = document.querySelector('tbody');
+                    orders.forEach(order => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${order.name}</td>
+                            <td><button class="toggle-info" data-id="${order.id}">Mostrar Informações</button></td>
+                        `;
+                        tbody.appendChild(row);
+
+                        // Cria uma linha de informações oculta
+                        const infoRow = document.createElement('tr');
+                        infoRow.id = `info-${order.id}`;
+                        infoRow.style.display = 'none';
+                        infoRow.innerHTML = `
+                            <td colspan="2">
+                                <p>Número da camisa: ${order.number}</p>
+                                <p>Tamanho: ${order.size}</p>
+                                <p>Tipo: ${order.type}</p>
+                                <p>Pagamento: ${order.payment}</p>
+                            </td>
+                        `;
+                        tbody.appendChild(infoRow);
+                    });
+
+                    // Adiciona evento de clique para todos os botões "Mostrar Informações"
+                    document.querySelectorAll('.toggle-info').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const orderId = this.getAttribute('data-id');
+                            const infoRow = document.getElementById(`info-${orderId}`);
+
+                            // Verifique se a linha de informações existe antes de acessar o estilo
+                            if (infoRow) {
+                                if (infoRow.style.display === 'none') {
+                                    infoRow.style.display = 'table-row';
+                                    this.textContent = 'Esconder Informações';
+                                } else {
+                                    infoRow.style.display = 'none';
+                                    this.textContent = 'Mostrar Informações';
+                                }
+                            } else {
+                                console.error(`Elemento info-${orderId} não encontrado.`);
+                            }
+                        });
+                    });
+
+                    // Função para copiar todos os pedidos
+                    document.getElementById('copyOrders').addEventListener('click', function() {
+                        let orderText = '';
+
+                        orders.forEach(order => {
+                            orderText += `Nome: ${order.name} Numero da camisa: ${order.number} Tamanho: ${order.type} ${order.size}\n`;
+                        });
+
+                        copyToClipboard(orderText);
+                    });
+                });
+        }
+
+        // Função para copiar o texto para a área de transferência
+        function copyToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('Pedidos copiados para a área de transferência!');
+        }
+    </script>
+</body>
+</html>
